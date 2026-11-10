@@ -24,7 +24,7 @@
             if (li >= lines.length) {
                 cursor.className = "cursor"; // finished: blink
                 var wave = document.createElement("img");
-                wave.src = "assets/waving.gif";
+                wave.src = "Assets/waving.gif";
                 wave.alt = "Guy Waving";
                 wave.className = "wave";
                 lineEls[lineEls.length - 1].insertBefore(wave, cursor);
