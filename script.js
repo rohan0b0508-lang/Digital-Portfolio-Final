@@ -1,9 +1,13 @@
 (function () {
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    /* ---------- Typing intro ---------- */
     var typingOn = true;
     try { typingOn = localStorage.getItem("typing") !== "off"; } catch (e) {}
+
+    var TYPE_MIN = 70;      
+    var TYPE_RANGE = 70;    
+    var START_DELAY = 900;  
+    var LINE_PAUSE = 450;   
 
     function typeInto(id, lines) {
         var el = document.getElementById(id);
@@ -11,7 +15,7 @@
 
         var lineEls = el.querySelectorAll(".line");
 
-        // typing is off: just show the full text straight away
+        // typing is off: 
         if (!typingOn) {
             Array.prototype.forEach.call(lineEls, function (l, i) {
                 l.textContent = "";
@@ -36,7 +40,7 @@
 
         function step() {
             if (li >= lines.length) {
-                cursor.className = "cursor"; // finished: blink
+                cursor.className = "cursor"; 
                 return;
             }
             var seg = lines[li][si];
@@ -47,17 +51,17 @@
                 lineEls[li].appendChild(cursor);
             }
             current.textContent += seg.t.charAt(ci++);
-            var delay = reduce ? 0 : 70 + Math.random() * 70;
+            var delay = TYPE_MIN + Math.random() * TYPE_RANGE;
             if (ci >= seg.t.length) {
                 ci = 0; si++;
-                if (si >= lines[li].length) { si = 0; li++; delay = 450; }
+                if (si >= lines[li].length) { si = 0; li++; delay = LINE_PAUSE; }
             }
             setTimeout(step, delay);
         }
 
         lineEls[0].appendChild(cursor);
-        cursor.className = "cursor"; // blink briefly before typing starts
-        setTimeout(function () { cursor.className = "cursor typing"; step(); }, reduce ? 0 : 900);
+        cursor.className = "cursor"; 
+        setTimeout(function () { cursor.className = "cursor typing"; step(); }, START_DELAY);
     }
 
     typeInto("hero-title", [
@@ -72,7 +76,7 @@
     typeInto("Unit2-title", [
         [{ t: "Unit 2 " }, { t: "Technology Systems", c: "accent" }]
     ]);
-    
+
     typeInto("Unit6-title", [
         [{ t: "Unit 6 " }, { t: "Digital Graphics", c: "accent" }]
     ]);
@@ -99,7 +103,6 @@
         });
     }
 
-    /* ---------- Stars + planet ---------- */
     var canvas = document.getElementById("stars");
     var planet = document.getElementById("planet");
     if (!canvas || !planet) return;
@@ -109,7 +112,6 @@
     var w = 0, h = 0, stars = [];
 
     var LAYERS = [
-        // drift = pixels per second the stars float upward on their own
         { count: 110, size: 0.7, speed: 0.05, alpha: 0.45, drift: 4 },
         { count: 60, size: 1.0, speed: 0.15, alpha: 0.7, drift: 9 },
         { count: 28, size: 1.5, speed: 0.35, alpha: 0.95, drift: 16 }
