@@ -375,11 +375,6 @@ main {
     :root { --p: 90px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .cursor { animation: none; }
-    .folder-items .icon-btn { animation: none; }
-}
-
 .hero-actions {
     display: flex;
     flex-direction: column;
