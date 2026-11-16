@@ -314,10 +314,6 @@ main {
     .hero-title .line {
         white-space: normal;
     }
-
-    .scroll-cue {
-        display: none;
-    }
 }
 
 #sky {
