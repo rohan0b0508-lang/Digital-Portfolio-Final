@@ -1,8 +1,4 @@
-// Starfield + ringed planet that follows the scroll + typing intro.
 (function () {
-    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    /* ---------- Typing intro ---------- */
     var title = document.getElementById("hero-title");
     if (title) {
         var lineEls = title.querySelectorAll(".line");
@@ -15,14 +11,18 @@
         cursor.textContent = "_";
         cursor.setAttribute("aria-hidden", "true");
 
-        // Remove the no-JS fallback text
         Array.prototype.forEach.call(lineEls, function (el) { el.textContent = ""; });
+
+        var TYPE_MIN = 70;
+        var TYPE_RANGE = 70;
+        var START_DELAY = 900;
+        var LINE_PAUSE = 450;
 
         var li = 0, si = 0, ci = 0, current = null;
 
         var typeStep = function () {
             if (li >= lines.length) {
-                cursor.className = "cursor"; // finished: blink
+                cursor.className = "cursor";
                 var wave = document.createElement("img");
                 wave.src = "Assets/waving.gif";
                 wave.alt = "Guy Waving";
@@ -38,20 +38,30 @@
                 lineEls[li].appendChild(cursor);
             }
             current.textContent += seg.t.charAt(ci++);
-            var delay = reduce ? 0 : 70 + Math.random() * 70;
+            var delay = TYPE_MIN + Math.random() * TYPE_RANGE;
             if (ci >= seg.t.length) {
                 ci = 0; si++;
-                if (si >= lines[li].length) { si = 0; li++; delay = 450; }
+                if (si >= lines[li].length) { si = 0; li++; delay = LINE_PAUSE; }
             }
             setTimeout(typeStep, delay);
         };
 
         lineEls[0].appendChild(cursor);
-        cursor.className = "cursor"; // blink briefly before typing starts
-        setTimeout(function () { cursor.className = "cursor typing"; typeStep(); }, reduce ? 0 : 900);
+        cursor.className = "cursor";
+        setTimeout(function () { cursor.className = "cursor typing"; typeStep(); }, START_DELAY);
     }
 
-    /* ---------- Stars + planet ---------- */
+    var blinkOn = true;
+    setInterval(function () {
+        blinkOn = !blinkOn;
+        var cursors = document.querySelectorAll(".cursor");
+        Array.prototype.forEach.call(cursors, function (c) {
+            c.style.animation = "none";
+            var solid = c.classList.contains("typing");
+            c.style.visibility = (solid || blinkOn) ? "visible" : "hidden";
+        });
+    }, 530);
+
     var canvas = document.getElementById("stars");
     var planet = document.getElementById("planet");
     if (!canvas || !planet) return;
@@ -61,7 +71,6 @@
     var w = 0, h = 0, stars = [];
 
     var LAYERS = [
-        // drift = pixels per second the stars float upward on their own
         { count: 110, size: 0.7, speed: 0.05, alpha: 0.45, drift: 4 },
         { count: 60, size: 1.0, speed: 0.15, alpha: 0.7, drift: 9 },
         { count: 28, size: 1.5, speed: 0.35, alpha: 0.95, drift: 16 }
@@ -90,16 +99,15 @@
         ctx.fillStyle = "#fff";
         stars.forEach(function (s) {
             var L = LAYERS[s.l];
-            var drift = reduce ? 0 : (time / 1000) * L.drift;
+            var drift = (time / 1000) * L.drift;
             var y = ((s.y - sy * L.speed - drift) % h + h) % h;
-            var tw = reduce ? 1 : 0.7 + 0.3 * Math.sin(time / 900 + s.t);
+            var tw = 0.7 + 0.3 * Math.sin(time / 900 + s.t);
             ctx.globalAlpha = L.alpha * tw;
             ctx.beginPath();
             ctx.arc(s.x, y, L.size, 0, 6.2832);
             ctx.fill();
         });
         ctx.globalAlpha = 1;
-
 
         var size = planet.offsetWidth;
         var cx = w * (w < 700 ? 0.62 : 0.7) - progress * w * 0.45;
