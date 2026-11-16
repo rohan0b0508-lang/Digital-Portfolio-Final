@@ -1,13 +1,11 @@
 (function () {
-    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     var typingOn = true;
     try { typingOn = localStorage.getItem("typing") !== "off"; } catch (e) {}
 
-    var TYPE_MIN = 70;      
-    var TYPE_RANGE = 70;    
-    var START_DELAY = 900;  
-    var LINE_PAUSE = 450;   
+    var TYPE_MIN = 70;
+    var TYPE_RANGE = 70;
+    var START_DELAY = 900;
+    var LINE_PAUSE = 450;
 
     function typeInto(id, lines) {
         var el = document.getElementById(id);
@@ -15,7 +13,6 @@
 
         var lineEls = el.querySelectorAll(".line");
 
-        // typing is off: 
         if (!typingOn) {
             Array.prototype.forEach.call(lineEls, function (l, i) {
                 l.textContent = "";
@@ -40,7 +37,7 @@
 
         function step() {
             if (li >= lines.length) {
-                cursor.className = "cursor"; 
+                cursor.className = "cursor";
                 return;
             }
             var seg = lines[li][si];
@@ -60,7 +57,7 @@
         }
 
         lineEls[0].appendChild(cursor);
-        cursor.className = "cursor"; 
+        cursor.className = "cursor";
         setTimeout(function () { cursor.className = "cursor typing"; step(); }, START_DELAY);
     }
 
@@ -103,6 +100,17 @@
         });
     }
 
+    var blinkOn = true;
+    setInterval(function () {
+        blinkOn = !blinkOn;
+        var cursors = document.querySelectorAll(".cursor");
+        Array.prototype.forEach.call(cursors, function (c) {
+            c.style.animation = "none";
+            var solid = c.classList.contains("typing");
+            c.style.visibility = (solid || blinkOn) ? "visible" : "hidden";
+        });
+    }, 530);
+
     var canvas = document.getElementById("stars");
     var planet = document.getElementById("planet");
     if (!canvas || !planet) return;
@@ -140,9 +148,9 @@
         ctx.fillStyle = "#fff";
         stars.forEach(function (s) {
             var L = LAYERS[s.l];
-            var drift = reduce ? 0 : (time / 1000) * L.drift;
+            var drift = (time / 1000) * L.drift;
             var y = ((s.y - sy * L.speed - drift) % h + h) % h;
-            var tw = reduce ? 1 : 0.7 + 0.3 * Math.sin(time / 900 + s.t);
+            var tw = 0.7 + 0.3 * Math.sin(time / 900 + s.t);
             ctx.globalAlpha = L.alpha * tw;
             ctx.beginPath();
             ctx.arc(s.x, y, L.size, 0, 6.2832);
