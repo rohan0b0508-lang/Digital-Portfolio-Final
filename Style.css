@@ -117,6 +117,13 @@ main {
     border-color: var(--accent);
 }
 
+.next-unit {
+    position: fixed;
+    right: clamp(16px, 4vw, 60px);
+    bottom: clamp(16px, 4vh, 40px);
+    z-index: 1;
+}
+
 .icon-row {
     display: flex;
     flex-wrap: wrap;
